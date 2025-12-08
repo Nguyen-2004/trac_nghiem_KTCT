@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Danh sách bộ đề</title>
+</head>
+<body>
+    <h1>Danh sách bộ đề</h1>
+    <ul>
+        {% for exam in exams %}
+            <li  style="margin-top: 20px">
+                <strong>{{ exam.title }}</strong><br>
+                {{ exam.description }}<br>
+                <a href="{% url 'start_exam' exam.id %}">Làm bài</a>
+            </li>
+        {% empty %}
+            <li>Chưa có bộ đề nào.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

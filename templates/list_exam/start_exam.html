@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Thi trắc nghiệm - {{ exam.title }}</title>
+    <style>
+        .correct {
+            background-color: #c8e6c9; /* xanh nhạt */
+        }
+        .incorrect {
+            background-color: #ffcdd2; /* đỏ nhạt */
+        }
+        .answer-label {
+            display: block;
+            padding: 8px;
+            margin: 4px 0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+            body {
+            font-size: 20px;
+        }
+        .answer-label input {
+            transform: scale(1.5); /* Tăng kích cỡ nút radio */
+            margin-right: 12px;
+        }
+        button {
+            margin-top: 30px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="{% url 'list_exam' %}">
+        <button type="button" style="margin: 0 !important;">Về danh sách bộ đề</button>
+    </a>
+    <h1>Bộ đề: {{ exam.title }}</h1>
+    <h2>Câu hỏi {{ q_index_plus_1 }} / {{ total_questions }}</h2>
+    <p style="font-weight: 700">{{ question.text }}</p>
+
+    {% if error_message %}
+        <p style="color:red; font-weight:bold;">{{ error_message }}</p>
+    {% endif %}
+
+    <form method="post" action="?q={{ q_index }}">
+        {% csrf_token %}
+        {% for answer in answers %}
+            {% if selected_id %}
+                {% if answer.id == correct_id %}
+                    <label class="answer-label correct">
+                        <input type="radio" name="answer" value="{{ answer.id }}" disabled
+                            {% if answer.id == selected_id %} checked {% endif %}>
+                        {{ answer.text }}
+                    </label>
+                {% elif answer.id == selected_id and not is_correct %}
+                    <label class="answer-label incorrect">
+                        <input type="radio" name="answer" value="{{ answer.id }}" disabled checked>
+                        {{ answer.text }}
+                    </label>
+                {% else %}
+                    <label class="answer-label">
+                        <input type="radio" name="answer" value="{{ answer.id }}" disabled
+                            {% if answer.id == selected_id %} checked {% endif %}>
+                        {{ answer.text }}
+                    </label>
+                {% endif %}
+            {% else %}
+                <label class="answer-label">
+                    <input type="radio" name="answer" value="{{ answer.id }}" required>
+                    {{ answer.text }}
+                </label>
+            {% endif %}
+        {% endfor %}
+    
+        <div class="button-wrapper">
+            {% if selected_id %}
+                {% if has_next_question %}
+                    <a href="?q={{ q_index_plus_1 }}">
+                        <button type="button">Câu tiếp theo</button>
+                    </a>
+                {% else %}
+                    <p>Bạn đã hoàn thành bài thi.</p>
+                    <p style="font-weight:bold; color:green;">
+                        Kết quả: {{ score }} / {{ total_questions }}
+                    </p>
+                {% endif %}
+            {% else %}
+                <input type="hidden" name="q_index" value="{{ q_index }}">
+                <button type="submit">Nộp câu trả lời</button>
+            {% endif %}
+        </div>
+
+        
+
+    </form>
+
+</body>
+</html>
